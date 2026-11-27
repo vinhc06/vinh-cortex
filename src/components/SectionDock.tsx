@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion, MotionConfig } from "motion/react";
+import { useEffect, useRef } from "react";
 import { resumeHref, sections } from "@/data/navigation";
 
 export function sectionPath(pathname: string) {
@@ -13,9 +14,23 @@ export function sectionPath(pathname: string) {
 
 export default function SectionDock({ pathname }: { pathname: string }) {
   const active = pathname === "/index" ? "/" : sectionPath(pathname);
+  const bar = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const element = bar.current;
+    if (!element) return;
+    const root = document.documentElement;
+    const measure = () => root.style.setProperty("--section-dock-height", `${element.offsetHeight}px`);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => {
+      observer.disconnect();
+      root.style.removeProperty("--section-dock-height");
+    };
+  }, []);
   return (
     <MotionConfig reducedMotion="user">
-      <div className="section-bar sticky top-0 z-25 flex items-center justify-between gap-2 border-b border-hairline px-3 py-3 backdrop-blur-md sm:justify-center sm:px-4">
+      <div ref={bar} className="section-bar sticky top-0 z-25 flex items-center justify-between gap-2 border-b border-hairline px-3 py-3 backdrop-blur-md sm:justify-center sm:px-4">
         <Link href="/" aria-label="Vinh Cortex home" className="grid size-8 shrink-0 place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-glow sm:absolute sm:left-5">
           <Image src="/icon.svg" alt="" width={24} height={24} unoptimized />
         </Link>

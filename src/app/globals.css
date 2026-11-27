@@ -16,6 +16,7 @@
 
 :root {
   color-scheme: dark;
+  --section-dock-height: 0px;
 }
 
 .section-bar,

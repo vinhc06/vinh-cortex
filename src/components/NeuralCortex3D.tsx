@@ -22,11 +22,15 @@ function GraphMessage({ children }: { children: ReactNode }) {
   return <p role="status" className="absolute inset-0 grid place-content-center px-6 text-center font-mono text-sm text-zinc-400">{children}</p>;
 }
 
-class GraphBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+class GraphBoundary extends Component<{ children: ReactNode; onWebGLUnavailable: () => void }, { failed: boolean }> {
   state = { failed: false };
 
   static getDerivedStateFromError() {
     return { failed: true };
+  }
+
+  componentDidCatch(error: Error) {
+    if (/Error creating WebGL context/i.test(error.message)) this.props.onWebGLUnavailable();
   }
 
   render() {
@@ -139,6 +143,7 @@ const NeuralCortex3D = memo(function NeuralCortex3D({
   onResetCamera,
   onIgnitionComplete,
   ignitionFinished,
+  onWebGLUnavailable,
 }: {
   nodes: CortexPreviewNode[];
   links: SynapseLink[];
@@ -148,6 +153,7 @@ const NeuralCortex3D = memo(function NeuralCortex3D({
   onResetCamera: () => void;
   onIgnitionComplete: () => void;
   ignitionFinished: boolean;
+  onWebGLUnavailable: () => void;
 }) {
   const sceneReady = useSceneReady();
   const playCue = useSoundCue();
@@ -505,7 +511,7 @@ const NeuralCortex3D = memo(function NeuralCortex3D({
     <section aria-label="Interactive 3D cortex" className="relative overflow-hidden rounded-2xl border border-hairline bg-background">
       <div ref={viewport} className="relative h-[clamp(24rem,64svh,50rem)] overflow-hidden">
         {sceneReady && size.width > 0 && size.height > 0 && (
-          <GraphBoundary>
+          <GraphBoundary onWebGLUnavailable={onWebGLUnavailable}>
             <ForceGraph
               graphRef={fgRef}
               onReady={initializeCamera}
