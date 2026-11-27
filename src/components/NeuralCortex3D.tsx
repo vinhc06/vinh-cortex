@@ -39,7 +39,7 @@ class GraphBoundary extends Component<{
     const contextFailed = /Error creating WebGL context/i.test(error.message);
     return (
       <div className="absolute inset-0 z-10 grid place-content-center gap-3 px-6 text-center font-mono text-sm text-zinc-400">
-        <p role="status">{contextFailed ? "This browser couldn’t start WebGL." : "The 3D Cortex couldn’t load."}</p>
+        <p role="status">{contextFailed ? "The 3D Cortex couldn’t start because WebGL initialization failed." : "The 3D Cortex couldn’t load."}</p>
         <div className="flex flex-wrap justify-center gap-4 text-glow">
           <button type="button" className="cursor-pointer underline" onClick={contextFailed ? this.props.onRetry : () => window.location.reload()}>
             {contextFailed ? "Retry 3D" : "Reload page"}
@@ -545,7 +545,7 @@ const NeuralCortex3D = memo(function NeuralCortex3D({
         {size ? (
           <GraphBoundary
             onRetry={onRetry}
-            indexAction={<button type="button" className="cursor-pointer underline" onClick={onBrowseIndex}>Open 2D Index</button>}
+            indexAction={<button type="button" className="cursor-pointer underline" onClick={onBrowseIndex}>Switch to 2D Index</button>}
           >
             <ForceGraph
               graphRef={fgRef}

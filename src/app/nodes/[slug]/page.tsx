@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getCortexGraph, getNodeBySlug } from "@/lib/cortex";
 import { resolveMediaUrl } from "@/lib/media";
+import { cortexHomeHref, cortexIndexHref } from "@/data/navigation";
 import { archivedNodeSlugs, isResumeCore, lobeColors, nodeHref } from "@/types/cortex";
 
 const dateFormat = new Intl.DateTimeFormat("en-US", {
@@ -37,7 +38,7 @@ export default async function CaseStudyPage({
 
   return (
     <main className="mx-auto w-full max-w-4xl px-5 py-10 sm:px-8 sm:py-14">
-      <Link href={isResumeCore(node) ? "/index" : "/"} className="font-mono text-sm text-primary hover:text-glow">
+      <Link href={isResumeCore(node) ? cortexIndexHref : cortexHomeHref} className="font-mono text-sm text-primary hover:text-glow">
         {isResumeCore(node) ? "← Back to index" : "← Back to Cortex"}
       </Link>
       <article className="mt-8 rounded-2xl border border-hairline bg-surface p-6 sm:p-10">

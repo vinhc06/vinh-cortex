@@ -1,4 +1,5 @@
 export const cortexHomeHref = "/";
+export const cortexIndexHref = "/cortex-index";
 
 export const sections = [
   { href: cortexHomeHref, label: "Cortex" },

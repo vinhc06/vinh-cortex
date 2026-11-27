@@ -9,7 +9,7 @@ import NeuralCortex3D, { type CortexCamera } from "./NeuralCortex3D";
 import NodeDrawer from "./NodeDrawer";
 import { CareerIcons } from "./SocialLinks";
 import ScrambleStat from "./ScrambleStat";
-import { useCortexHomeVisit, useSoundCue } from "./TacticalEffects";
+import { useSoundCue } from "./TacticalEffects";
 
 const telemetryUrl = process.env.NEXT_PUBLIC_AWS_TELEMETRY_URL?.trim() || "/api/telemetry";
 const modes = [["3d", "3D Cortex"], ["2d", "2D Index"]] as const;
@@ -24,11 +24,8 @@ export default function CortexWorkspace({
   links: SynapseLink[];
   entry: "home" | "index";
 }) {
-  const homeVisit = useCortexHomeVisit();
-  const [preference, setPreference] = useState<{ view: View; visit: number }>();
-  const chosenView = preference?.visit === homeVisit ? preference.view : undefined;
   const home = entry === "home";
-  const view: View = chosenView ?? (home ? "3d" : "2d");
+  const [view, setView] = useState<View>(home ? "3d" : "2d");
   const [graphAttempt, setGraphAttempt] = useState(0);
   const playCue = useSoundCue();
   const [ignited, setIgnited] = useState(false);
@@ -48,8 +45,8 @@ export default function CortexWorkspace({
     if (next === view) return;
     playCue("route");
     closeDrawer();
-    setPreference({ view: next, visit: homeVisit });
-  }, [closeDrawer, homeVisit, playCue, view]);
+    setView(next);
+  }, [closeDrawer, playCue, view]);
   const showIndex = useCallback(() => changeView("2d"), [changeView]);
   const selectNode = useCallback(({ slug }: CortexPreviewNode) => {
     cameraRef.current?.focusNode(slug);
