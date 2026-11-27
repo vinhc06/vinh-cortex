@@ -156,7 +156,6 @@ const NeuralCortex3D = memo(function NeuralCortex3D({
   ignitionFinished,
   onRetry,
   onBrowseIndex,
-  canMountCanvas,
 }: {
   nodes: CortexPreviewNode[];
   links: SynapseLink[];
@@ -168,7 +167,6 @@ const NeuralCortex3D = memo(function NeuralCortex3D({
   ignitionFinished: boolean;
   onRetry: () => void;
   onBrowseIndex: () => void;
-  canMountCanvas: boolean;
 }) {
   const sceneReady = useSceneReady();
   const playCue = useSoundCue();
@@ -541,7 +539,7 @@ const NeuralCortex3D = memo(function NeuralCortex3D({
   return (
     <section aria-label="Interactive 3D cortex" className="relative overflow-hidden rounded-2xl border border-hairline bg-background">
       <div ref={viewport} className="relative h-[clamp(24rem,64svh,50rem)] overflow-hidden">
-        {canMountCanvas && size.width > 0 && size.height > 0 && (
+        {size.width > 0 && size.height > 0 && (
           <GraphBoundary onRetry={onRetry} onBrowseIndex={onBrowseIndex}>
             <ForceGraph
               graphRef={fgRef}

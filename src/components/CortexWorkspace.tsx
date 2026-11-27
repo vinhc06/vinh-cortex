@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { startTransition, useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { startTransition, useCallback, useEffect, useRef, useState } from "react";
 import type { TelemetrySnapshot } from "@/lib/telemetry";
 import type { CortexPreviewNode, CortexWorkspaceNode, SynapseLink } from "@/types/cortex";
 import CortexIndex2D from "./CortexIndex2D";
@@ -12,18 +12,8 @@ import ScrambleStat from "./ScrambleStat";
 import { useCortexHomeVisit, useSoundCue } from "./TacticalEffects";
 
 const telemetryUrl = process.env.NEXT_PUBLIC_AWS_TELEMETRY_URL?.trim() || "/api/telemetry";
-const desktopQuery = "(min-width: 768px)";
 const modes = [["3d", "3D Cortex"], ["2d", "2D Index"]] as const;
 type View = (typeof modes)[number][0];
-
-function subscribeToViewport(notify: () => void) {
-  const media = matchMedia(desktopQuery);
-  media.addEventListener("change", notify);
-  return () => media.removeEventListener("change", notify);
-}
-
-const readViewport = () => matchMedia(desktopQuery).matches ? "desktop" : "mobile";
-const viewportOnServer = () => "unknown";
 
 export default function CortexWorkspace({
   nodes,
@@ -34,12 +24,11 @@ export default function CortexWorkspace({
   links: SynapseLink[];
   entry: "home" | "index";
 }) {
-  const viewport = useSyncExternalStore(subscribeToViewport, readViewport, viewportOnServer);
   const homeVisit = useCortexHomeVisit();
   const [preference, setPreference] = useState<{ view: View; visit: number }>();
   const chosenView = preference?.visit === homeVisit ? preference.view : undefined;
   const home = entry === "home";
-  const view: View = home ? chosenView ?? (viewport === "mobile" ? "2d" : "3d") : "2d";
+  const view: View = chosenView ?? (home ? "3d" : "2d");
   const [graphAttempt, setGraphAttempt] = useState(0);
   const playCue = useSoundCue();
   const [ignited, setIgnited] = useState(false);
@@ -111,23 +100,19 @@ export default function CortexWorkspace({
               <dd className="text-glow" role="status">{systemStatus}</dd>
             </div>
           </dl>
-          {home && (
-            <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
-              <div role="group" aria-label="Cortex view" className="inline-flex rounded-full border border-primary/25 bg-background/90 p-0.5 font-mono text-[0.65rem] tracking-wide uppercase shadow-inner">
-                {modes.map(([mode, label]) => (
-                  <button
-                    key={mode}
-                    type="button"
-                    aria-pressed={view === mode}
-                    onClick={() => changeView(mode)}
-                    className="cursor-pointer rounded-full px-2.5 py-1.5 text-slate-400 transition-colors hover:text-glow active:scale-[0.97] aria-pressed:bg-primary/20 aria-pressed:text-glow sm:px-3"
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+          <div role="group" aria-label="Cortex view" className="ml-auto inline-flex rounded-full border border-primary/25 bg-background/90 p-0.5 font-mono text-[0.65rem] tracking-wide uppercase shadow-inner">
+            {modes.map(([mode, label]) => (
+              <button
+                key={mode}
+                type="button"
+                aria-pressed={view === mode}
+                onClick={() => changeView(mode)}
+                className="cursor-pointer rounded-full px-2.5 py-1.5 text-slate-400 transition-colors hover:text-glow active:scale-[0.97] aria-pressed:bg-primary/20 aria-pressed:text-glow sm:px-3"
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
       </header>
 
@@ -152,7 +137,6 @@ export default function CortexWorkspace({
             ignitionFinished={ignited}
             onRetry={retryGraph}
             onBrowseIndex={showIndex}
-            canMountCanvas={viewport !== "unknown"}
           />
           <AnimatePresence mode="wait">
             {node && <NodeDrawer key={node.slug} node={node} connections={connections} onSelectNode={selectNode} onClose={closeDrawer} />}
