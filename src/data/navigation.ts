@@ -1,5 +1,7 @@
+export const cortexHomeHref = "/";
+
 export const sections = [
-  { href: "/", label: "Cortex" },
+  { href: cortexHomeHref, label: "Cortex" },
   { href: "/about", label: "About" },
   { href: "/and", label: "And?" },
   { href: "/writing", label: "Writing" },

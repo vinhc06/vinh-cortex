@@ -144,6 +144,7 @@ const NeuralCortex3D = memo(function NeuralCortex3D({
   onIgnitionComplete,
   ignitionFinished,
   onWebGLUnavailable,
+  canMountCanvas,
 }: {
   nodes: CortexPreviewNode[];
   links: SynapseLink[];
@@ -154,12 +155,14 @@ const NeuralCortex3D = memo(function NeuralCortex3D({
   onIgnitionComplete: () => void;
   ignitionFinished: boolean;
   onWebGLUnavailable: () => void;
+  canMountCanvas: boolean;
 }) {
   const sceneReady = useSceneReady();
   const playCue = useSoundCue();
   const viewport = useRef<HTMLDivElement>(null);
   const fgRef = useRef<GraphMethods | undefined>(undefined);
   const hasInitializedCameraRef = useRef(false);
+  const hasStartedIgnition = useRef(false);
   const pendingCameraAction = useRef<{ slug: string } | "reset" | null>(null);
   const hoveredSlug = useRef<string | undefined>(undefined);
   const focusedSlug = useRef<string | undefined>(undefined);
@@ -180,6 +183,7 @@ const NeuralCortex3D = memo(function NeuralCortex3D({
     fromNodes: ReturnType<typeof nodePositions>; toNodes: ReturnType<typeof nodePositions>;
   } | null>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
+  const [fontsReady, setFontsReady] = useState(false);
   const graphData = useMemo(() => {
     const active = new Set(nodes.filter((node) => node.status === "active").map((node) => node.slug));
     const positions = nodePositions(nodes, "cortex");
@@ -259,13 +263,15 @@ const NeuralCortex3D = memo(function NeuralCortex3D({
       const nextSize = { width: Math.floor(width), height: Math.floor(height) };
       setSize((current) => current.width === nextSize.width && current.height === nextSize.height ? current : nextSize);
     });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
     let disposed = false;
-    const observe = () => { if (!disposed) observer.observe(element); };
-    void document.fonts.load(labelFont()).then(observe, observe);
-    return () => {
-      disposed = true;
-      observer.disconnect();
-    };
+    const reveal = () => { if (!disposed) setFontsReady(true); };
+    void Promise.resolve(document.fonts?.load(labelFont())).then(reveal, reveal);
+    return () => { disposed = true; };
   }, []);
 
   const updateLabel = useCallback((slug: string | undefined) => {
@@ -370,10 +376,10 @@ const NeuralCortex3D = memo(function NeuralCortex3D({
   useLayoutEffect(() => {
     selectedLabelSlug.current = selectedSlug;
     categoryRef.current = category;
-    labelsReady.current = ignitionFinished;
+    labelsReady.current = ignitionFinished && fontsReady;
     opticsRef.current = optics;
     applyOptics();
-  }, [selectedSlug, category, ignitionFinished, optics, applyOptics]);
+  }, [selectedSlug, category, fontsReady, ignitionFinished, optics, applyOptics]);
 
   const handleHover = useCallback((node: GraphNode | null) => {
     const previous = hoveredSlug.current;
@@ -420,6 +426,30 @@ const NeuralCortex3D = memo(function NeuralCortex3D({
 
   useImperativeHandle(cameraRef, () => ({ focusNode: (slug) => moveCamera({ slug }) }), [moveCamera]);
 
+  const beginIgnition = useCallback(() => {
+    const graph = fgRef.current;
+    if (!sceneReady || !graph || !hasInitializedCameraRef.current || hasStartedIgnition.current) return;
+    hasStartedIgnition.current = true;
+    if (!hasIgnited && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const target = targets[0];
+      morph.current = {
+        start: performance.now(), duration: ignitionDuration, ignition: true,
+        fromCloud: new Float32Array(pointCount * 3), toCloud: target.cloud,
+        fromNodes: graphData.nodes.map(() => [0, 0, 0]), toNodes: target.nodes,
+      };
+      tickMorph(0);
+      graph.cameraPosition({ x: 0, y: 0, z: 7 }, origin, 0);
+      graph.cameraPosition(homePosition, origin, ignitionDuration - 100);
+      graph.d3ReheatSimulation();
+    } else {
+      queueMicrotask(onIgnitionComplete);
+    }
+
+    const pending = pendingCameraAction.current;
+    pendingCameraAction.current = null;
+    if (pending) moveCamera(pending);
+  }, [graphData, moveCamera, onIgnitionComplete, sceneReady, targets, tickMorph]);
+
   const initializeCamera = useCallback(() => {
     const graph = fgRef.current;
     if (!graph || hasInitializedCameraRef.current) return;
@@ -450,26 +480,13 @@ const NeuralCortex3D = memo(function NeuralCortex3D({
       camera.fov = 38;
       camera.updateProjectionMatrix();
     }
-    if (!hasIgnited && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      const target = targets[0];
-      morph.current = {
-        start: performance.now(), duration: ignitionDuration, ignition: true,
-        fromCloud: new Float32Array(pointCount * 3), toCloud: target.cloud,
-        fromNodes: graphData.nodes.map(() => [0, 0, 0]), toNodes: target.nodes,
-      };
-      tickMorph(0);
-      graph.cameraPosition({ x: 0, y: 0, z: 7 }, origin, 0);
-      graph.cameraPosition(homePosition, origin, ignitionDuration - 100);
-      graph.d3ReheatSimulation();
-    } else {
-      graph.cameraPosition(homePosition, origin, 0);
-      queueMicrotask(onIgnitionComplete);
-    }
+    graph.cameraPosition(homePosition, origin, 0);
+    beginIgnition();
+  }, [applyOptics, beginIgnition, graphData]);
 
-    const pending = pendingCameraAction.current;
-    pendingCameraAction.current = null;
-    if (pending) moveCamera(pending);
-  }, [applyOptics, graphData, moveCamera, onIgnitionComplete, targets, tickMorph]);
+  useEffect(() => {
+    beginIgnition();
+  }, [beginIgnition]);
 
   useEffect(() => () => {
     restoreLabelLayout.current?.();
@@ -481,6 +498,7 @@ const NeuralCortex3D = memo(function NeuralCortex3D({
     cloud.current = null;
     morph.current = null;
     hasInitializedCameraRef.current = false;
+    hasStartedIgnition.current = false;
   }, []);
 
   const handleReset = useCallback(() => {
@@ -510,7 +528,7 @@ const NeuralCortex3D = memo(function NeuralCortex3D({
   return (
     <section aria-label="Interactive 3D cortex" className="relative overflow-hidden rounded-2xl border border-hairline bg-background">
       <div ref={viewport} className="relative h-[clamp(24rem,64svh,50rem)] overflow-hidden">
-        {sceneReady && size.width > 0 && size.height > 0 && (
+        {canMountCanvas && size.width > 0 && size.height > 0 && (
           <GraphBoundary onWebGLUnavailable={onWebGLUnavailable}>
             <ForceGraph
               graphRef={fgRef}

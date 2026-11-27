@@ -9,7 +9,7 @@ import NeuralCortex3D, { type CortexCamera } from "./NeuralCortex3D";
 import NodeDrawer from "./NodeDrawer";
 import { CareerIcons } from "./SocialLinks";
 import ScrambleStat from "./ScrambleStat";
-import { useSoundCue } from "./TacticalEffects";
+import { useCortexHomeVisit, useSoundCue } from "./TacticalEffects";
 
 const telemetryUrl = process.env.NEXT_PUBLIC_AWS_TELEMETRY_URL?.trim() || "/api/telemetry";
 const desktopQuery = "(min-width: 768px)";
@@ -22,22 +22,25 @@ function subscribeToViewport(notify: () => void) {
   return () => media.removeEventListener("change", notify);
 }
 
-const isDesktopViewport = () => matchMedia(desktopQuery).matches;
-const desktopOnServer = () => true;
+const readViewport = () => matchMedia(desktopQuery).matches ? "desktop" : "mobile";
+const viewportOnServer = () => "unknown";
 
 export default function CortexWorkspace({
   nodes,
   links,
-  initialView,
+  entry,
 }: {
   nodes: CortexWorkspaceNode[];
   links: SynapseLink[];
-  initialView?: "2d";
+  entry: "home" | "index";
 }) {
-  const isDesktop = useSyncExternalStore(subscribeToViewport, isDesktopViewport, desktopOnServer);
-  const [chosenView, setChosenView] = useState<View>();
+  const viewport = useSyncExternalStore(subscribeToViewport, readViewport, viewportOnServer);
+  const homeVisit = useCortexHomeVisit();
+  const [preference, setPreference] = useState<{ view: View; visit: number }>();
+  const chosenView = preference?.visit === homeVisit ? preference.view : undefined;
   const [webglUnavailable, setWebglUnavailable] = useState(false);
-  const view: View = initialView === "2d" || webglUnavailable ? "2d" : chosenView ?? (isDesktop ? "3d" : "2d");
+  const home = entry === "home";
+  const view: View = !home || webglUnavailable ? "2d" : chosenView ?? (viewport === "mobile" ? "2d" : "3d");
   const playCue = useSoundCue();
   const [ignited, setIgnited] = useState(false);
   const finishIgnition = useCallback(() => setIgnited(true), []);
@@ -70,7 +73,7 @@ export default function CortexWorkspace({
     if (next === view || (next === "3d" && webglUnavailable)) return;
     playCue("route");
     closeDrawer();
-    setChosenView(next);
+    setPreference({ view: next, visit: homeVisit });
   }
 
   useEffect(() => {
@@ -91,7 +94,7 @@ export default function CortexWorkspace({
 
   return (
     <>
-      <header className={`z-20 border-b border-hairline bg-surface/85 backdrop-blur-xl ${initialView ? "relative" : "sticky top-(--section-dock-height)"}`} data-ignition={view === "3d" ? ignited ? "ready" : "pending" : undefined}>
+      <header className={`z-20 border-b border-hairline bg-surface/85 backdrop-blur-xl ${home ? "sticky top-(--section-dock-height)" : "relative"}`} data-ignition={view === "3d" ? ignited ? "ready" : "pending" : undefined}>
         <div className="mx-auto flex w-full max-w-[100rem] flex-wrap items-center justify-between gap-x-5 gap-y-3 px-4 py-3 sm:px-7">
           <div className="ignition-hud flex items-center gap-2 whitespace-nowrap font-mono text-[0.68rem] tracking-wide text-glow sm:text-xs">
             <span aria-hidden="true" className="size-1.5 rounded-full bg-glow shadow-[0_0_10px_#22D3EE]" />
@@ -108,7 +111,7 @@ export default function CortexWorkspace({
               <dd className="text-glow" role="status">{systemStatus}</dd>
             </div>
           </dl>
-          {!initialView && (
+          {home && (
             <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
               {webglUnavailable && <p role="status" className="font-mono text-[0.65rem] text-slate-400">WebGL unavailable</p>}
               <div role="group" aria-label="Cortex view" className="inline-flex rounded-full border border-primary/25 bg-background/90 p-0.5 font-mono text-[0.65rem] tracking-wide uppercase shadow-inner">
@@ -149,6 +152,7 @@ export default function CortexWorkspace({
             onIgnitionComplete={finishIgnition}
             ignitionFinished={ignited}
             onWebGLUnavailable={fallbackToIndex}
+            canMountCanvas={viewport !== "unknown"}
           />
           <AnimatePresence mode="wait">
             {node && <NodeDrawer key={node.slug} node={node} connections={connections} onSelectNode={selectNode} onClose={closeDrawer} />}

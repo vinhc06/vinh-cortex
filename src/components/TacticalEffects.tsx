@@ -8,7 +8,7 @@ import SectionDock, { sectionPath } from "./SectionDock";
 import WelcomeOverlay from "./WelcomeOverlay";
 import ClosingFooter from "./ClosingFooter";
 import { CareerIcons } from "./SocialLinks";
-import { resumeHref, sections } from "@/data/navigation";
+import { cortexHomeHref, resumeHref, sections } from "@/data/navigation";
 import { useCortexAudio, type SoundCue, type SoundMode } from "@/lib/use-cortex-audio";
 
 const chrome = createContext<{
@@ -18,7 +18,9 @@ const chrome = createContext<{
   playCue: (cue: SoundCue) => void;
 }>({ openNavigation: () => {}, toggleSound: () => {}, sound: "armed", playCue: () => {} });
 const sceneReadyContext = createContext(true);
+const homeVisitContext = createContext(0);
 export const useSceneReady = () => useContext(sceneReadyContext);
+export const useCortexHomeVisit = () => useContext(homeVisitContext);
 export const useSoundCue = () => useContext(chrome).playCue;
 const targets = "a, button, summary, label, input[type='range'], [role='button'], [data-reticle-target]";
 const editors = "input:not([type='range']), textarea, select, [contenteditable]:not([contenteditable='false'])";
@@ -63,6 +65,10 @@ export default function TacticalEffects({ children }: { children: ReactNode }) {
   const [welcomeOpen, setWelcomeOpen] = useState(true);
   const [welcomeBlocking, setWelcomeBlocking] = useState(true);
   const [sceneReady, setSceneReady] = useState(false);
+  const [homeVisit, setHomeVisit] = useState(0);
+  const navigateCortex = useCallback(() => {
+    if (pathname === cortexHomeHref) setHomeVisit((visit) => visit + 1);
+  }, [pathname]);
   const restoreAfterIntro = useRef<HTMLElement | null>(null);
   const dock = useRef<HTMLDivElement>(null);
   const dismissWelcome = useCallback(() => {
@@ -74,10 +80,6 @@ export default function TacticalEffects({ children }: { children: ReactNode }) {
   }, [playCue, unlock]);
   const finishWelcome = useCallback(() => {
     setWelcomeBlocking(false);
-    requestAnimationFrame(() => {
-      const previous = restoreAfterIntro.current;
-      (previous?.isConnected ? previous : dock.current?.querySelector("a"))?.focus({ preventScroll: true });
-    });
   }, []);
   function replayWelcome(event: React.MouseEvent<HTMLButtonElement>) {
     welcomeDismissed.current = false;
@@ -88,7 +90,14 @@ export default function TacticalEffects({ children }: { children: ReactNode }) {
   const cursor = useRef<HTMLDivElement>(null);
   const dialog = useRef<HTMLDialogElement>(null);
   useLayoutEffect(() => {
-    if (dock.current) dock.current.inert = welcomeBlocking;
+    const page = dock.current;
+    if (!page) return;
+    page.inert = welcomeBlocking;
+    if (welcomeBlocking) return;
+
+    const previous = restoreAfterIntro.current;
+    const viewButton = page.querySelector<HTMLButtonElement>('[aria-label="Cortex view"] button[aria-pressed="true"]');
+    (previous?.isConnected ? previous : viewButton ?? page.querySelector("a"))?.focus({ preventScroll: true });
   }, [welcomeBlocking]);
   const openNavigation = useCallback(() => {
     if (!welcomeBlocking && dialog.current && !dialog.current.open) dialog.current.showModal();
@@ -154,15 +163,17 @@ export default function TacticalEffects({ children }: { children: ReactNode }) {
   return (
     <chrome.Provider value={{ openNavigation, toggleSound, sound, playCue }}>
       <div ref={dock} className="flex min-h-dvh flex-col">
-        <SectionDock pathname={pathname} />
+        <SectionDock pathname={pathname} onCortexNavigate={navigateCortex} />
         <sceneReadyContext.Provider value={sceneReady}>
-          <div className="relative">
-            <MotionConfig reducedMotion="user">
-              <AnimatePresence initial={false}>
-                <SectionFrame key={sectionPath(pathname)}>{children}</SectionFrame>
-              </AnimatePresence>
-            </MotionConfig>
-          </div>
+          <homeVisitContext.Provider value={homeVisit}>
+            <div className="relative">
+              <MotionConfig reducedMotion="user">
+                <AnimatePresence initial={false}>
+                  <SectionFrame key={sectionPath(pathname)}>{children}</SectionFrame>
+                </AnimatePresence>
+              </MotionConfig>
+            </div>
+          </homeVisitContext.Provider>
         </sceneReadyContext.Provider>
         <ClosingFooter>
             <CareerIcons />
@@ -186,7 +197,7 @@ export default function TacticalEffects({ children }: { children: ReactNode }) {
         </header>
         <nav aria-label="Quick navigation" className="mt-3 grid gap-1">
           {sections.map(({ href, label }) => (
-            <Link key={href} href={href} onClick={() => dialog.current?.close()} className="rounded px-2 py-1.5 hover:bg-primary/10 hover:text-glow">{label}</Link>
+            <Link key={href} href={href} onNavigate={href === cortexHomeHref ? navigateCortex : undefined} onClick={() => dialog.current?.close()} className="rounded px-2 py-1.5 hover:bg-primary/10 hover:text-glow">{label}</Link>
           ))}
           <a href={resumeHref} target="_blank" rel="noopener noreferrer" onClick={() => dialog.current?.close()} className="rounded px-2 py-1.5 hover:bg-primary/10 hover:text-glow">Resume ↗</a>
         </nav>
