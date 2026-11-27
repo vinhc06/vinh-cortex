@@ -1,7 +1,6 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import { Component, memo, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type Ref } from "react";
 import {
   AdditiveBlending, AmbientLight, BufferAttribute, BufferGeometry, CanvasTexture, Color, DynamicDrawUsage, Group, Mesh, MeshBasicMaterial,
@@ -22,21 +21,33 @@ function GraphMessage({ children }: { children: ReactNode }) {
   return <p role="status" className="absolute inset-0 grid place-content-center px-6 text-center font-mono text-sm text-zinc-400">{children}</p>;
 }
 
-class GraphBoundary extends Component<{ children: ReactNode; onWebGLUnavailable: () => void }, { failed: boolean }> {
-  state = { failed: false };
+class GraphBoundary extends Component<{
+  children: ReactNode;
+  onRetry: () => void;
+  onBrowseIndex: () => void;
+}, { error: Error | null }> {
+  state = { error: null as Error | null };
 
-  static getDerivedStateFromError() {
-    return { failed: true };
-  }
-
-  componentDidCatch(error: Error) {
-    if (/Error creating WebGL context/i.test(error.message)) this.props.onWebGLUnavailable();
+  static getDerivedStateFromError(error: Error) {
+    return { error };
   }
 
   render() {
-    return this.state.failed
-      ? <GraphMessage><span>3D rendering is unavailable.</span><Link href="/index" className="mt-2 text-glow underline">Browse the 2D case study index</Link></GraphMessage>
-      : this.props.children;
+    const { error } = this.state;
+    if (!error) return this.props.children;
+
+    const contextFailed = /Error creating WebGL context/i.test(error.message);
+    return (
+      <div className="absolute inset-0 z-10 grid place-content-center gap-3 px-6 text-center font-mono text-sm text-zinc-400">
+        <p role="status">{contextFailed ? "This browser couldn’t start WebGL." : "The 3D Cortex couldn’t load."}</p>
+        <div className="flex flex-wrap justify-center gap-4 text-glow">
+          <button type="button" className="cursor-pointer underline" onClick={contextFailed ? this.props.onRetry : () => window.location.reload()}>
+            {contextFailed ? "Retry 3D" : "Reload page"}
+          </button>
+          <button type="button" className="cursor-pointer underline" onClick={this.props.onBrowseIndex}>Open 2D Index</button>
+        </div>
+      </div>
+    );
   }
 }
 
@@ -143,7 +154,8 @@ const NeuralCortex3D = memo(function NeuralCortex3D({
   onResetCamera,
   onIgnitionComplete,
   ignitionFinished,
-  onWebGLUnavailable,
+  onRetry,
+  onBrowseIndex,
   canMountCanvas,
 }: {
   nodes: CortexPreviewNode[];
@@ -154,7 +166,8 @@ const NeuralCortex3D = memo(function NeuralCortex3D({
   onResetCamera: () => void;
   onIgnitionComplete: () => void;
   ignitionFinished: boolean;
-  onWebGLUnavailable: () => void;
+  onRetry: () => void;
+  onBrowseIndex: () => void;
   canMountCanvas: boolean;
 }) {
   const sceneReady = useSceneReady();
@@ -529,7 +542,7 @@ const NeuralCortex3D = memo(function NeuralCortex3D({
     <section aria-label="Interactive 3D cortex" className="relative overflow-hidden rounded-2xl border border-hairline bg-background">
       <div ref={viewport} className="relative h-[clamp(24rem,64svh,50rem)] overflow-hidden">
         {canMountCanvas && size.width > 0 && size.height > 0 && (
-          <GraphBoundary onWebGLUnavailable={onWebGLUnavailable}>
+          <GraphBoundary onRetry={onRetry} onBrowseIndex={onBrowseIndex}>
             <ForceGraph
               graphRef={fgRef}
               onReady={initializeCamera}

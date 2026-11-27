@@ -38,9 +38,9 @@ export default function CortexWorkspace({
   const homeVisit = useCortexHomeVisit();
   const [preference, setPreference] = useState<{ view: View; visit: number }>();
   const chosenView = preference?.visit === homeVisit ? preference.view : undefined;
-  const [webglUnavailable, setWebglUnavailable] = useState(false);
   const home = entry === "home";
-  const view: View = !home || webglUnavailable ? "2d" : chosenView ?? (viewport === "mobile" ? "2d" : "3d");
+  const view: View = home ? chosenView ?? (viewport === "mobile" ? "2d" : "3d") : "2d";
+  const [graphAttempt, setGraphAttempt] = useState(0);
   const playCue = useSoundCue();
   const [ignited, setIgnited] = useState(false);
   const finishIgnition = useCallback(() => setIgnited(true), []);
@@ -51,10 +51,17 @@ export default function CortexWorkspace({
   const cameraRef = useRef<CortexCamera>(null);
   const node = nodes.find(({ slug }) => slug === selectedSlug);
   const closeDrawer = useCallback(() => setSelectedSlug(undefined), []);
-  const fallbackToIndex = useCallback(() => {
-    setWebglUnavailable(true);
+  const retryGraph = useCallback(() => {
     closeDrawer();
+    setGraphAttempt((attempt) => attempt + 1);
   }, [closeDrawer]);
+  const changeView = useCallback((next: View) => {
+    if (next === view) return;
+    playCue("route");
+    closeDrawer();
+    setPreference({ view: next, visit: homeVisit });
+  }, [closeDrawer, homeVisit, playCue, view]);
+  const showIndex = useCallback(() => changeView("2d"), [changeView]);
   const selectNode = useCallback(({ slug }: CortexPreviewNode) => {
     cameraRef.current?.focusNode(slug);
     startTransition(() => setSelectedSlug(slug));
@@ -68,13 +75,6 @@ export default function CortexWorkspace({
     connectedSlugs.delete(node.slug);
   }
   const connections = nodes.filter(({ slug }) => connectedSlugs.has(slug));
-
-  function changeView(next: View) {
-    if (next === view || (next === "3d" && webglUnavailable)) return;
-    playCue("route");
-    closeDrawer();
-    setPreference({ view: next, visit: homeVisit });
-  }
 
   useEffect(() => {
     const controller = new AbortController();
@@ -113,16 +113,14 @@ export default function CortexWorkspace({
           </dl>
           {home && (
             <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
-              {webglUnavailable && <p role="status" className="font-mono text-[0.65rem] text-slate-400">WebGL unavailable</p>}
               <div role="group" aria-label="Cortex view" className="inline-flex rounded-full border border-primary/25 bg-background/90 p-0.5 font-mono text-[0.65rem] tracking-wide uppercase shadow-inner">
                 {modes.map(([mode, label]) => (
                   <button
                     key={mode}
                     type="button"
                     aria-pressed={view === mode}
-                    disabled={mode === "3d" && webglUnavailable}
                     onClick={() => changeView(mode)}
-                    className="cursor-pointer rounded-full px-2.5 py-1.5 text-slate-400 transition-colors hover:text-glow active:scale-[0.97] aria-pressed:bg-primary/20 aria-pressed:text-glow disabled:cursor-not-allowed disabled:opacity-50 sm:px-3"
+                    className="cursor-pointer rounded-full px-2.5 py-1.5 text-slate-400 transition-colors hover:text-glow active:scale-[0.97] aria-pressed:bg-primary/20 aria-pressed:text-glow sm:px-3"
                   >
                     {label}
                   </button>
@@ -143,6 +141,7 @@ export default function CortexWorkspace({
             </div>
           </div>
           <NeuralCortex3D
+            key={graphAttempt}
             nodes={nodes}
             links={links}
             selectedSlug={selectedSlug}
@@ -151,7 +150,8 @@ export default function CortexWorkspace({
             onResetCamera={closeDrawer}
             onIgnitionComplete={finishIgnition}
             ignitionFinished={ignited}
-            onWebGLUnavailable={fallbackToIndex}
+            onRetry={retryGraph}
+            onBrowseIndex={showIndex}
             canMountCanvas={viewport !== "unknown"}
           />
           <AnimatePresence mode="wait">
