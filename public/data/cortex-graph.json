@@ -1,0 +1,425 @@
+{
+  "nodes": [
+    {
+      "title": "Align",
+      "slug": "align",
+      "lobe": "engineering",
+      "status": "active",
+      "date": "2026-11-27",
+      "summary": "An engineering portfolio project. Case study details are forthcoming.",
+      "tags": [
+        "Engineering"
+      ],
+      "html": "<p>Project scope, implementation, and outcomes will be documented here.</p>\n<p>Connected project: [[lockin]].</p>"
+    },
+    {
+      "title": "AP Capstone Driving Sim Study",
+      "slug": "ap-capstone-driving-sim",
+      "lobe": "engineering",
+      "status": "completed",
+      "date": "2026-11-27",
+      "summary": "An IRB-approved behavioral study using a driving simulator with 80 participants.",
+      "tags": [
+        "AP Capstone",
+        "Behavioral Research",
+        "Driving Simulation"
+      ],
+      "metrics": {
+        "participants": 80,
+        "review": "IRB approved"
+      },
+      "html": "<p>This AP Capstone project paired a driving simulator with a behavioral study involving 80 participants under an IRB-approved protocol.</p>\n<p>Connected notes: [[game-development]], [[habit-architecture]].</p>"
+    },
+    {
+      "title": "AutoViz",
+      "slug": "autoviz-engine",
+      "lobe": "engineering",
+      "status": "completed",
+      "date": "2025-09-20",
+      "summary": "Natural-language-to-Vega-Lite engine built with Python, Streamlit, Pandas, Pydantic, and the Gemini API.",
+      "tags": [
+        "Python",
+        "Vega-Lite",
+        "Pydantic",
+        "LLMs"
+      ],
+      "impact": [
+        "Turned natural-language chart requests into validated Vega-Lite specifications.",
+        "Used Pydantic to catch invalid output before rendering."
+      ],
+      "repoUrl": "https://github.com/vinhc06",
+      "featured": true,
+      "html": "<p>Structured schema validation with Pydantic paired with declarative Vega-Lite specs to catch invalid chart definitions before rendering. Related work includes [[intelent-ai]] and [[ml-quantum-lab]].</p>"
+    },
+    {
+      "title": "Beyond Code",
+      "slug": "beyond-code",
+      "lobe": "creatives",
+      "status": "active",
+      "date": "2026-11-27",
+      "summary": "A portal to And What Else?, where athletics, creative craft, and life outside engineering are collected.",
+      "tags": [
+        "Editorial"
+      ],
+      "html": "<p>Explore athletics, creative craft, and hands-on pursuits on the And What Else? page.</p>\n<p>Connected notes: [[visual-storytelling]], [[house-djing]], [[habit-architecture]].</p>"
+    },
+    {
+      "title": "Frontier Tech Writing",
+      "slug": "frontier-tech-writing",
+      "lobe": "writing",
+      "status": "active",
+      "date": "2026-11-26",
+      "summary": "Drafts and notes on local-first AI, emerging interfaces, and how new tools fit into everyday work.",
+      "impact": [
+        "Started a writing archive with a draft on how to scope and inspect local-first agent workflows."
+      ],
+      "tags": [
+        "Writing",
+        "Frontier Tech",
+        "Local-First AI"
+      ],
+      "featured": true,
+      "html": "<p>This node leads to the writing archive, starting with a draft on local-first AI agents.</p>\n<p>Connected notes: [[intelent-ai]], [[habit-architecture]].</p>"
+    },
+    {
+      "title": "3D Game Engineering",
+      "slug": "game-development",
+      "lobe": "creatives",
+      "status": "active",
+      "date": "2026-11-26",
+      "summary": "Physics, NPC pathfinding, and gameplay systems across UE5, Unity, and Roblox Studio from 2019 to 2024.",
+      "tags": [
+        "Unreal Engine 5",
+        "Unity",
+        "Roblox Studio",
+        "Physics",
+        "NPC Pathfinding"
+      ],
+      "metrics": {
+        "projectPeriod": "2019–2024"
+      },
+      "featured": true,
+      "html": "<p>I built 3D gameplay systems from 2019 to 2024, working with physics, NPC pathfinding, and player interactions in Unreal Engine 5, Unity, and Roblox Studio. This work taught me to connect code, visuals, input, and feedback into something a player can learn by doing.</p>\n<p>Connected notes: [[ap-capstone-driving-sim]], [[vt-cs-systems]], [[visual-storytelling]].</p>"
+    },
+    {
+      "title": "Cognitive & Routine Systems",
+      "slug": "habit-architecture",
+      "lobe": "optimization",
+      "status": "active",
+      "date": "2026-11-26",
+      "summary": "Neuroscience-informed habit architecture, attention routines, and game theory.",
+      "tags": [
+        "Habits",
+        "Neuroscience",
+        "Game Theory",
+        "Obsidian"
+      ],
+      "impact": [
+        "Use iOS Shortcuts and Obsidian to reduce friction in everyday routines."
+      ],
+      "featured": true,
+      "html": "<p>I draw on neuroscience research about sleep and attention to design routines with clearer cues and less friction. I use iOS Shortcuts and Obsidian to make the next action easier. Hold’em ranges, expected value, and chess give me ways to practice decision-making under uncertainty.</p>\n<p>Connected notes: [[lockin]], [[ap-capstone-driving-sim]], [[beyond-code]].</p>"
+    },
+    {
+      "title": "Electronic Audio Lab",
+      "slug": "house-djing",
+      "lobe": "creatives",
+      "status": "active",
+      "date": "2026-11-26",
+      "summary": "House and techno mixing with a Pioneer DDJ-SB3 and Serato.",
+      "tags": [
+        "Pioneer DDJ-SB3",
+        "Serato",
+        "House",
+        "Techno"
+      ],
+      "html": "<p>I use the DDJ-SB3 with Serato to practice phrasing, transitions, and pacing across house and techno sets.</p>\n<p>Connected notes: [[visual-storytelling]].</p>"
+    },
+    {
+      "title": "Intelent Technologies LLC",
+      "slug": "intelent-ai",
+      "lobe": "engineering",
+      "status": "active",
+      "date": "2026-10-15",
+      "summary": "AI consulting, fine-tuned models, and downloadable local-first agentic automation systems.",
+      "tags": [
+        "AI Agents",
+        "Python",
+        "TypeScript",
+        "Founder"
+      ],
+      "impact": [
+        "Founded Intelent around downloadable, local-first AI workflows.",
+        "Combined fine-tuned models with deterministic automation."
+      ],
+      "metrics": {
+        "founded": "Oct 2026",
+        "focus": "Local-First Agents"
+      },
+      "featured": true,
+      "html": "<p>Founded Intelent to bridge custom fine-tuned models with deterministic local workflows. Shares architectural DNA with [[autoviz-engine]] and [[opendsa-engine]].</p>"
+    },
+    {
+      "title": "LockIn",
+      "slug": "lockin",
+      "lobe": "engineering",
+      "status": "active",
+      "date": "2026-11-26",
+      "summary": "A project for exploring how software can support focused work.",
+      "tags": [
+        "Focus",
+        "Productivity"
+      ],
+      "html": "<p>LockIn connects the design of focus tools with the everyday routines and automation they need to support.</p>\n<p>Connected notes: [[habit-architecture]], [[align]].</p>"
+    },
+    {
+      "title": "ML & Quantum Lab",
+      "slug": "ml-quantum-lab",
+      "lobe": "engineering",
+      "status": "active",
+      "date": "2026-11-27",
+      "summary": "Experiments with Qiskit, scikit-learn, vector embeddings, and retrieval-augmented generation.",
+      "tags": [
+        "Qiskit",
+        "scikit-learn",
+        "Embeddings",
+        "RAG"
+      ],
+      "html": "<p>This node collects experiments across Qiskit and classical machine learning with scikit-learn, alongside vector embeddings and retrieval-augmented generation pipelines.</p>\n<p>Connected notes: [[intelent-ai]], [[autoviz-engine]], [[vt-cs-systems]].</p>"
+    },
+    {
+      "title": "OpenDSA @ Virginia Tech",
+      "slug": "opendsa-engine",
+      "lobe": "engineering",
+      "status": "active",
+      "date": "2026-11-01",
+      "summary": "Ruby on Rails, PostgreSQL staging tables, scheduled cron jobs, and client-side IndexedDB caching for interactive CS learning analytics.",
+      "tags": [
+        "Ruby on Rails",
+        "PostgreSQL",
+        "IndexedDB",
+        "Systems"
+      ],
+      "impact": [
+        "Built instructor analytics around PostgreSQL staging tables and scheduled jobs.",
+        "Implemented client-side caching with IndexedDB through localForage."
+      ],
+      "repoUrl": "https://github.com/vinhc06",
+      "metrics": {
+        "role": "Software Engineer RA",
+        "stack": "Rails + Postgres + IndexedDB"
+      },
+      "featured": true,
+      "html": "<p>Building high-throughput instructor analytics and client-side caching via <code>localForage</code> at Virginia Tech. Connects directly to my focus on [[autoviz-engine]] and [[intelent-ai]].</p>"
+    },
+    {
+      "title": "Polar Dream Travel",
+      "slug": "polar-dream-travel",
+      "lobe": "engineering",
+      "status": "active",
+      "date": "2026-11-26",
+      "summary": "Software engineering internship at Polar Dream Travel.",
+      "impact": [
+        "Worked as a software engineering intern at Polar Dream Travel."
+      ],
+      "tags": [
+        "Software Engineering",
+        "Internship"
+      ],
+      "html": "<p>My software engineering internship at Polar Dream Travel is part of the path that brought me from building games to research engineering and local-first software.</p>\n<p>Connected notes: [[opendsa-engine]].</p>"
+    },
+    {
+      "title": "Cinema & Optics",
+      "slug": "visual-storytelling",
+      "lobe": "creatives",
+      "status": "active",
+      "date": "2026-11-15",
+      "summary": "Image-making with a Sony ZV-E10, Viltrox 9mm lens, black mist diffusion, and DaVinci Resolve.",
+      "tags": [
+        "Sony ZV-E10",
+        "Viltrox 9mm",
+        "Black Mist",
+        "DaVinci Resolve"
+      ],
+      "impact": [
+        "Shot and color-graded visual essays and event reels."
+      ],
+      "videoKey": "reels/featured-reel.mp4",
+      "metrics": {
+        "camera": "Sony ZV-E10 + Viltrox 9mm",
+        "grade": "DaVinci Resolve"
+      },
+      "featured": true,
+      "html": "<p>I shoot on a Sony ZV-E10 with a Viltrox 9mm lens and use black mist diffusion to soften highlights. In DaVinci Resolve I refine color, timing, and the continuity between shots.</p>\n<p>Connected notes: [[frontier-tech-writing]], [[beyond-code]].</p>"
+    },
+    {
+      "title": "VT CS & Systems Stack",
+      "slug": "vt-cs-systems",
+      "lobe": "engineering",
+      "status": "active",
+      "date": "2026-11-27",
+      "summary": "Virginia Tech Computer Science ’27, from systems programming and assembly to PostgreSQL and Docker.",
+      "tags": [
+        "C",
+        "C++",
+        "Java",
+        "RISC-V",
+        "x86-64",
+        "PostgreSQL",
+        "Docker"
+      ],
+      "html": "<p>My Virginia Tech computer science stack spans C and C++, Java, RISC-V and x86-64 assembly, PostgreSQL, and Docker. It connects low-level systems work with the tools I use to build and run applications.</p>\n<p>Connected notes: [[opendsa-engine]], [[ml-quantum-lab]], [[game-development]].</p>"
+    },
+    {
+      "title": "VT VSA Fundraising Chair",
+      "slug": "vt-vsa-fundraising",
+      "lobe": "engineering",
+      "status": "active",
+      "date": "2026-11-27",
+      "summary": "Fundraising leadership for Virginia Tech’s Vietnamese Student Association.",
+      "tags": [
+        "Fundraising",
+        "Student Leadership",
+        "Virginia Tech"
+      ],
+      "impact": [
+        "Serve as Fundraising Chair for the Vietnamese Student Association at Virginia Tech."
+      ],
+      "html": "<p>My role centers on fundraising for the Vietnamese Student Association and is part of my student leadership experience at Virginia Tech.</p>\n<p>Connected note: [[opendsa-engine]].</p>"
+    }
+  ],
+  "links": [
+    {
+      "source": "align",
+      "target": "lockin"
+    },
+    {
+      "source": "ap-capstone-driving-sim",
+      "target": "game-development"
+    },
+    {
+      "source": "ap-capstone-driving-sim",
+      "target": "habit-architecture"
+    },
+    {
+      "source": "autoviz-engine",
+      "target": "intelent-ai"
+    },
+    {
+      "source": "autoviz-engine",
+      "target": "ml-quantum-lab"
+    },
+    {
+      "source": "beyond-code",
+      "target": "visual-storytelling"
+    },
+    {
+      "source": "beyond-code",
+      "target": "house-djing"
+    },
+    {
+      "source": "beyond-code",
+      "target": "habit-architecture"
+    },
+    {
+      "source": "frontier-tech-writing",
+      "target": "intelent-ai"
+    },
+    {
+      "source": "frontier-tech-writing",
+      "target": "habit-architecture"
+    },
+    {
+      "source": "game-development",
+      "target": "ap-capstone-driving-sim"
+    },
+    {
+      "source": "game-development",
+      "target": "vt-cs-systems"
+    },
+    {
+      "source": "game-development",
+      "target": "visual-storytelling"
+    },
+    {
+      "source": "habit-architecture",
+      "target": "lockin"
+    },
+    {
+      "source": "habit-architecture",
+      "target": "ap-capstone-driving-sim"
+    },
+    {
+      "source": "habit-architecture",
+      "target": "beyond-code"
+    },
+    {
+      "source": "house-djing",
+      "target": "visual-storytelling"
+    },
+    {
+      "source": "intelent-ai",
+      "target": "autoviz-engine"
+    },
+    {
+      "source": "intelent-ai",
+      "target": "opendsa-engine"
+    },
+    {
+      "source": "lockin",
+      "target": "habit-architecture"
+    },
+    {
+      "source": "lockin",
+      "target": "align"
+    },
+    {
+      "source": "ml-quantum-lab",
+      "target": "intelent-ai"
+    },
+    {
+      "source": "ml-quantum-lab",
+      "target": "autoviz-engine"
+    },
+    {
+      "source": "ml-quantum-lab",
+      "target": "vt-cs-systems"
+    },
+    {
+      "source": "opendsa-engine",
+      "target": "autoviz-engine"
+    },
+    {
+      "source": "opendsa-engine",
+      "target": "intelent-ai"
+    },
+    {
+      "source": "polar-dream-travel",
+      "target": "opendsa-engine"
+    },
+    {
+      "source": "visual-storytelling",
+      "target": "frontier-tech-writing"
+    },
+    {
+      "source": "visual-storytelling",
+      "target": "beyond-code"
+    },
+    {
+      "source": "vt-cs-systems",
+      "target": "opendsa-engine"
+    },
+    {
+      "source": "vt-cs-systems",
+      "target": "ml-quantum-lab"
+    },
+    {
+      "source": "vt-cs-systems",
+      "target": "game-development"
+    },
+    {
+      "source": "vt-vsa-fundraising",
+      "target": "opendsa-engine"
+    }
+  ]
+}

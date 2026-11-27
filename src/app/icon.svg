@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" fill="none">
+  <title>Optical-Pulse VC</title>
+  <circle cx="24" cy="24" r="22" fill="#090b0e" stroke="#697483" stroke-width="2"/>
+  <path d="M25 4 37 13l-3 10M44 22l-7 12-11 1M34 42l-14 1-7-9M13 42 5 30l4-10M4 17l10-10 11 1" stroke="#434e5d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="24" cy="24" r="15.5" fill="#0b1016" stroke="#303b48" stroke-width="1.2"/>
+  <path d="m10 20 5 10 5-10h2.5l2.6-5 2.9 13 2.3-5H32m5.7-3.5a5.4 5.4 0 1 0 0 9" stroke="#22d3ee" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

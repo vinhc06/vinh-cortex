@@ -1,26 +1,165 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-background: #090b0e;
+  --color-foreground: #ededed;
+  --color-surface: #11141a;
+  --color-hairline: #1e242e;
+  --color-primary: #06b6d4;
+  --color-glow: #22d3ee;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  color-scheme: dark;
+}
+
+.section-bar,
+.welcome-curtain {
+  background-image:
+    linear-gradient(#64748b13 1px, transparent 1px),
+    linear-gradient(90deg, #64748b13 1px, transparent 1px),
+    radial-gradient(ellipse at center, #102028, #090b0e 72%);
+  background-size: 32px 32px, 32px 32px, 100% 100%;
+  background-position: center;
+}
+
+.editorial-photo-placeholder {
+  background: radial-gradient(ellipse at 22% 15%, #22d3ee1a, transparent 64%),
+              linear-gradient(145deg, #152029, #0d1016 73%);
+}
+
+.welcome-curtain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 55% 48% at center, #22d3ee0c, transparent 70%),
+              radial-gradient(ellipse at center, transparent 10%, #090b0e 92%);
+  pointer-events: none;
+}
+
+.welcome-particles {
+  position: absolute;
+  inset: -15%;
+  pointer-events: none;
+  opacity: 0.4;
+  background-image: radial-gradient(circle, #67e8f9 0 1px, transparent 1.5px),
+                    radial-gradient(circle, #64748b 0 0.7px, transparent 1.4px);
+  background-size: 147px 179px, 83px 107px;
+  background-position: 19px 5px, 41px 63px;
+  mask-image: radial-gradient(ellipse at center, transparent 20%, #000 64%, transparent 95%);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .welcome-particles { animation: welcome-drift 20s linear infinite alternate; }
+}
+
+@keyframes welcome-drift {
+  to { transform: translate3d(24px, -34px, 0); }
+}
+
+.welcome-vignette {
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 48%, #090b0e94 0%, #090b0e36 40%, #090b0ec9 82%, #090b0e 100%);
+}
+
+@keyframes ignition-hud {
+  from { opacity: 0.25; transform: translateY(-7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ignition-hud-fallback {
+  from { opacity: 0.25; transform: translateY(-7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-ignition="pending"] .ignition-hud {
+    animation: ignition-hud-fallback 360ms calc(2.7s + var(--ignition-delay, 0ms)) cubic-bezier(0.2, 0.8, 0.25, 1) both;
+  }
+  [data-ignition="ready"] .ignition-hud {
+    animation: ignition-hud 360ms var(--ignition-delay, 0ms) cubic-bezier(0.2, 0.8, 0.25, 1) both;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.tactical-reticle {
+  display: none;
+  position: fixed;
+  z-index: 120;
+  inset: 0 auto auto 0;
+  pointer-events: none;
+}
+
+@media (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  html[data-reticle] .tactical-reticle { display: block; }
+}
+
+.tactical-reticle span {
+  display: block;
+  width: 14px;
+  height: 14px;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(#22d3ee, #22d3ee) center / 1px 100% no-repeat,
+              linear-gradient(#22d3ee, #22d3ee) center / 100% 1px no-repeat;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  transition: transform 120ms ease-out, border-color 120ms ease-out;
+  filter: drop-shadow(0 0 3px #090b0e);
+}
+
+.tactical-reticle[data-target] span {
+  transform: translate(-50%, -50%) scale(1.55);
+  border-color: #22d3eeaa;
+}
+
+.creative-preview {
+  --art-sky: #253996;
+  --art-light: #ffbd78;
+  --art-ground: #3e206e;
+}
+
+.creative-preview[data-art="house-djing"] { --art-sky: #451e8e; --art-light: #ff70cb; --art-ground: #072568; }
+.creative-preview[data-art="game-development"] { --art-sky: #00696f; --art-light: #79f5be; --art-ground: #212b66; }
+.creative-preview[data-art="precision-barbering"] { --art-sky: #95503e; --art-light: #ffdc96; --art-ground: #39265d; }
+.creative-preview[data-art="lion-dance"] { --art-sky: #811738; --art-light: #ffe65f; --art-ground: #591e81; }
+
+.creative-preview__image {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 66% 34%, var(--art-light) 0 13%, transparent 14%),
+    linear-gradient(152deg, transparent 0 55%, var(--art-ground) 55% 67%, transparent 67%),
+    linear-gradient(30deg, var(--art-ground) 0 39%, transparent 39%),
+    linear-gradient(160deg, var(--art-sky), var(--art-light));
+}
+
+.creative-preview[data-variant="1"] .creative-preview__image {
+  background:
+    repeating-linear-gradient(142deg, transparent 0 8px, #0a0c202e 9px 10px),
+    radial-gradient(ellipse at 25% 75%, var(--art-light) 0 13%, transparent 41%),
+    conic-gradient(from 25deg at 60% 38%, var(--art-ground), var(--art-sky), var(--art-light), var(--art-ground));
+}
+
+.creative-preview__image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, #09121c 0 1px, transparent 1.2px) 0 0 / 4px 4px, #35475950;
+  backdrop-filter: grayscale(1) contrast(1.2) sepia(0.3) hue-rotate(155deg);
+  transition: opacity 240ms ease;
+}
+
+.creative-preview:is(:focus-visible, [aria-pressed="true"]) .creative-preview__image::after { opacity: 0; }
+
+@media (hover: hover) {
+  .creative-preview:hover .creative-preview__image::after { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .creative-preview__image::after { transition: none; }
 }
