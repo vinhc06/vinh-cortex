@@ -24,7 +24,7 @@ function GraphMessage({ children }: { children: ReactNode }) {
 class GraphBoundary extends Component<{
   children: ReactNode;
   onRetry: () => void;
-  onBrowseIndex: () => void;
+  indexAction: ReactNode;
 }, { error: Error | null }> {
   state = { error: null as Error | null };
 
@@ -44,7 +44,7 @@ class GraphBoundary extends Component<{
           <button type="button" className="cursor-pointer underline" onClick={contextFailed ? this.props.onRetry : () => window.location.reload()}>
             {contextFailed ? "Retry 3D" : "Reload page"}
           </button>
-          <button type="button" className="cursor-pointer underline" onClick={this.props.onBrowseIndex}>Open 2D Index</button>
+          {this.props.indexAction}
         </div>
       </div>
     );
@@ -193,7 +193,7 @@ const NeuralCortex3D = memo(function NeuralCortex3D({
     fromCloud: Float32Array; toCloud: Float32Array;
     fromNodes: ReturnType<typeof nodePositions>; toNodes: ReturnType<typeof nodePositions>;
   } | null>(null);
-  const [size, setSize] = useState({ width: 0, height: 0 });
+  const [size, setSize] = useState<{ width: number; height: number } | null>(null);
   const [fontsReady, setFontsReady] = useState(false);
   const graphData = useMemo(() => {
     const active = new Set(nodes.filter((node) => node.status === "active").map((node) => node.slug));
@@ -269,12 +269,15 @@ const NeuralCortex3D = memo(function NeuralCortex3D({
   useEffect(() => {
     const element = viewport.current;
     if (!element) return;
-    const observer = new ResizeObserver(([entry]) => {
-      const { width, height } = entry.contentRect;
-      const nextSize = { width: Math.floor(width), height: Math.floor(height) };
-      setSize((current) => current.width === nextSize.width && current.height === nextSize.height ? current : nextSize);
-    });
+    function measure(container: HTMLDivElement) {
+      const { clientWidth: width, clientHeight: height } = container;
+      // Keep the last usable size when a mounted canvas is temporarily hidden.
+      if (width === 0 || height === 0) return;
+      setSize((current) => current?.width === width && current.height === height ? current : { width, height });
+    }
+    const observer = new ResizeObserver(() => measure(element));
     observer.observe(element);
+    measure(element);
     return () => observer.disconnect();
   }, []);
 
@@ -539,8 +542,11 @@ const NeuralCortex3D = memo(function NeuralCortex3D({
   return (
     <section aria-label="Interactive 3D cortex" className="relative overflow-hidden rounded-2xl border border-hairline bg-background">
       <div ref={viewport} className="relative h-[clamp(24rem,64svh,50rem)] overflow-hidden">
-        {size.width > 0 && size.height > 0 && (
-          <GraphBoundary onRetry={onRetry} onBrowseIndex={onBrowseIndex}>
+        {size ? (
+          <GraphBoundary
+            onRetry={onRetry}
+            indexAction={<button type="button" className="cursor-pointer underline" onClick={onBrowseIndex}>Open 2D Index</button>}
+          >
             <ForceGraph
               graphRef={fgRef}
               onReady={initializeCamera}
@@ -572,7 +578,7 @@ const NeuralCortex3D = memo(function NeuralCortex3D({
               onNodeClick={onSelectNode}
             />
           </GraphBoundary>
-        )}
+        ) : <GraphMessage>Waiting for canvas layout…</GraphMessage>}
         <div className="pointer-events-none absolute inset-x-4 top-4 flex">
           <p className="rounded-md border border-hairline bg-surface/80 px-2.5 py-1.5 font-mono text-xs tracking-wider text-slate-400 md:hidden">
             PINCH TO ZOOM · DRAG TO ORBIT
